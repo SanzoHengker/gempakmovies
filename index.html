@@ -52,6 +52,11 @@
             color: white;
             outline: none;
             width: 250px;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar:focus {
+            border-color: #e50914;
         }
 
         /* Movie Section */
@@ -86,7 +91,7 @@
 
         .movie-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.2);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3);
         }
 
         .movie-poster {
@@ -145,18 +150,19 @@
     <main class="main-content">
         <h2 id="title-display" class="section-title">Filem Popular Hari Ini</h2>
         <div id="movie-grid" class="movie-grid">
-            <!-- JavaScript akan masukkan kad filem di sini secara automatik -->
+            <!-- Data filem akan dimasukkan di sini oleh JavaScript -->
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2026 GempakMovies. Dikuasakan oleh TMDB API.</p>
+        <p>&copy; 2026 GempakMovies. Dikuasakan oleh TMDB API Terkini.</p>
     </footer>
 
     <!-- JavaScript untuk Ambil Data Filem -->
     <script>
-        // API Key demo (Guna public key TMDB untuk tujuan pembelajaran)
-        const API_KEY = '3fd2be6f0c70a2a598f084ddfb2154c8'; 
+        // Kunci keselamatan token kau (Menggunakan Read Access Token)
+        const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzYjZjZjg4YzIxMjBiNTk5ODdiYjI5ZWU4MThjYWI4MyIsIm5iZiI6MTc3OTUxMTU0Ny45NDEsInN1YiI6IjZhMTEzMGZiMWYyNDVkOWE2ODRiNDc3OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.QshCr1EhnIf-M6acv3Y-iEwwx0IYwtt1DJnMStEOOX4'; 
+        
         const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 
@@ -164,23 +170,33 @@
         const searchInput = document.getElementById('search');
         const titleDisplay = document.getElementById('title-display');
 
-        // 1. Fungsi untuk ambil data filem popular semasa halaman dibuka
+        // Tetapan HTTP Headers untuk pengesahan token yang selamat
+        const options = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: `Bearer ${TMDB_TOKEN}`
+            }
+        };
+
+        // 1. Fungsi untuk ambil filem popular semasa mula buka website
         async function dapatkanFilemPopular() {
-            const url = `${TMDB_BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
+            const url = `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1`;
             try {
-                const respon = await fetch(url);
+                const respon = await fetch(url, options);
                 const data = await respon.json();
                 paparkanFilem(data.results);
             } catch (ralat) {
                 console.error("Gagal memuatkan data filem:", ralat);
+                movieGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ff4444;">Ralat sambungan API. Sila periksa konsol browser.</p>`;
             }
         }
 
-        // 2. Fungsi untuk papar filem ke dalam HTML grid
+        // 2. Fungsi untuk papar senarai filem ke dalam grid HTML
         function paparkanFilem(filemList) {
-            movieGrid.innerHTML = ''; // Kosongkan grid asal
+            movieGrid.innerHTML = ''; // Kosongkan grid
 
-            if(filemList.length === 0) {
+            if (!filemList || filemList.length === 0) {
                 movieGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666;">Filem tidak ditemui.</p>`;
                 return;
             }
@@ -188,20 +204,20 @@
             filemList.forEach(filem => {
                 const { title, poster_path, vote_average, release_date } = filem;
                 
-                // Ganti gambar kosong jika tiada poster
-                const gambarPoster = poster_path ? IMG_URL + poster_path : 'https://via.placeholder.com/500x750?text=No+Poster';
+                const gambarPoster = poster_path ? IMG_URL + poster_path : 'https://via.placeholder.com/500x750?text=Tiada+Poster';
                 const tahunLancar = release_date ? release_date.split('-')[0] : 'N/A';
+                const ratingSkor = vote_average ? vote_average.toFixed(1) : '0.0';
 
                 const kadFilem = document.createElement('div');
                 kadFilem.classList.add('movie-card');
                 
                 kadFilem.innerHTML = `
-                    <img class="movie-poster" src="${gambarPoster}" alt="${title}">
+                    <img class="movie-poster" src="${gambarPoster}" alt="${title}" loading="lazy">
                     <div class="movie-info">
                         <div class="movie-name" title="${title}">${title}</div>
                         <div class="movie-meta">
                             <span>${tahunLancar}</span>
-                            <span class="movie-rating">★ ${vote_average.toFixed(1)}</span>
+                            <span class="movie-rating">★ ${ratingSkor}</span>
                         </div>
                     </div>
                 `;
@@ -210,20 +226,20 @@
             });
         }
 
-        // 3. Fungsi Carian Filem (Bila user taip di search bar)
+        // 3. Fungsi Carian Filem secara Dinamik (Bila user menaip)
         searchInput.addEventListener('keyup', async (e) => {
             const kataKunci = e.target.value.trim();
 
             if (kataKunci && kataKunci !== '') {
                 titleDisplay.innerText = `Hasil Carian untuk: "${kataKunci}"`;
-                const urlCarian = `${TMDB_BASE_URL}/search/movie?api_key=${API_KEY}&query=${kataKunci}&language=en-US&page=1`;
+                const urlCarian = `${TMDB_BASE_URL}/search/movie?query=${encodeURIComponent(kataKunci)}&language=en-US&page=1`;
                 
                 try {
-                    const respon = await fetch(urlCarian);
+                    const respon = await fetch(urlCarian, options);
                     const data = await respon.json();
                     paparkanFilem(data.results);
                 } catch (ralat) {
-                    console.error("Gagal mencari filem:", ralat);
+                    console.error("Gagal melakukan carian filem:", ralat);
                 }
             } else {
                 titleDisplay.innerText = "Filem Popular Hari Ini";
@@ -231,7 +247,7 @@
             }
         });
 
-        // Jalankan fungsi utama semasa mula-mula buka website
+        // Jalankan fungsi utama sebaik sahaja fail dibuka
         dapatkanFilemPopular();
     </script>
 </body>

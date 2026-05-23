@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GempakMovies | Portal Filem & Streaming</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Tambah font ikon untuk butang bookmark kegemaran -->
+    <!-- Menggunakan font ikon FontAwesome untuk profil & kegemaran -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- Navigation -->
+    <!-- Navigation Bar -->
     <nav>
         <div class="logo">GempakMovies</div>
         
@@ -21,16 +21,19 @@
             <span id="tab-watchlist" class="nav-tab">Watchlist Saya</span>
         </div>
 
+        <!-- Bahagian Kanan Nav (Carian & Profil) -->
         <div class="search-container">
             <input type="text" id="search" class="search-bar" placeholder="Cari di sini...">
             
             <!-- Menu Profil Pengguna -->
             <div class="profile-dropdown">
-                <button id="profile-btn" class="profile-btn"><i class="fa-solid fa-user"></i> Profil</button>
+                <button id="profile-btn" class="profile-btn">
+                    <i class="fa-solid fa-user"></i> Profil
+                </button>
                 <div id="profile-menu" class="dropdown-content">
                     <p id="user-email-display">Memuatkan emel...</p>
                     <p id="user-joined-display" class="user-meta-text">Daftar: -</p>
-                    <hr style="border-color: #333; margin: 8px 0;">
+                    <hr style="border-color: #333; margin: 10px 0;">
                     <button id="logout-btn" class="logout-btn-link">Keluar Akaun</button>
                 </div>
             </div>
@@ -57,7 +60,7 @@
 
             <!-- Ruang Informasi Filem / Siri TV -->
             <div class="modal-details">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px;">
                     <h2 id="modal-title" class="modal-title">Tajuk Kandungan</h2>
                     <!-- Butang Watchlist -->
                     <button id="modal-watchlist-btn" class="watchlist-toggle-btn">
@@ -74,17 +77,10 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 GempakMovies. Dikuasakan oleh MSZ Studios</p>
+        <p>&copy; 2026 GempakMovies. Dikuasakan oleh TMDB & Embed Pihak Ketiga.</p>
     </footer>
 
-    <!-- Firebase SDK (Guna App, Auth, dan Firestore) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    </script>
-
-    <!-- JavaScript Portal Utama -->
+    <!-- Dipanggil menggunakan type="module" untuk sokongan Firebase SDK modular -->
     <script type="module" src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GempakMovies | Masuk & Daftar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+    <div class="auth-container">
+        <div class="logo" style="text-align: center; margin-bottom: 30px;">GempakMovies</div>
+        
+        <!-- BORANG LOGIN -->
+        <div id="login-form-container">
+            <h2 class="auth-title">Log Masuk</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="login-email">Emel</label>
+                    <input type="email" id="login-email" required placeholder="contoh@emel.com">
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Kata Laluan</label>
+                    <input type="password" id="login-password" required placeholder="Masukkan kata laluan">
+                </div>
+                <button type="submit" class="auth-btn">Masuk</button>
+            </form>
+            <p class="auth-switch">Belum ada akaun? <span id="go-to-signup">Daftar Sekarang</span></p>
+        </div>
+
+        <!-- BORANG SIGN UP -->
+        <div id="signup-form-container" style="display: none;">
+            <h2 class="auth-title">Daftar Akaun</h2>
+            <form id="signup-form">
+                <div class="input-group">
+                    <label for="signup-email">Emel</label>
+                    <input type="email" id="signup-email" required placeholder="contoh@emel.com">
+                </div>
+                <div class="input-group">
+                    <label for="signup-password">Kata Laluan</label>
+                    <input type="password" id="signup-password" required placeholder="Minima 6 aksara">
+                </div>
+                <button type="submit" class="auth-btn">Daftar</button>
+            </form>
+            <p class="auth-switch">Dah ada akaun? <span id="go-to-login">Log Masuk</span></p>
+        </div>
+    </div>
+
+    <!-- Kita panggil auth.js sebagai module kerana menggunakan sintaks import ES6 -->
+    <script type="module" src="auth.js"></script>
+</body>
+</html>

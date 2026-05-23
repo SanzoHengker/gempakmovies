@@ -55,7 +55,7 @@
             
             <!-- Ruang Player Video (Iframe) -->
             <div class="player-container">
-                <iframe id="video-player" src="" allowfullscreen scrolling="no"></iframe>
+                <iframe id="video-player" src="" allowfullscreen scrolling="no" allow="autoplay"></iframe>
             </div>
 
             <!-- Ruang Informasi Filem / Siri TV -->
@@ -72,6 +72,14 @@
                     <span id="modal-rating" style="color: #f5c518;">★ 0.0</span>
                 </div>
                 <p id="modal-overview" class="modal-overview">Sinopsis...</p>
+                
+                <!-- Pemilihan Episod (Hanya untuk Siri TV) -->
+                <div id="episodes-container" class="episodes-container" style="display: none;">
+                    <h3 class="episodes-title">Senarai Episod</h3>
+                    <div id="episodes-list" class="episodes-list">
+                        <!-- Butang episod akan dimasukkan secara dinamik oleh JS -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>

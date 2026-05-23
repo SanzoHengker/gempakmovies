@@ -5,7 +5,7 @@ const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzYjZjZjg4YzIxMjBiNTk5ODdiYjI5
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
 
-// TUKAR DOMAIN KE vidsrc.me (LEBIH STABIL & AKTIF)
+// Menggunakan Server Embed Asal (vidsrc.me dikekalkan untuk kestabilan)
 const MOVIE_EMBED_URL = 'https://vidsrc.me/embed/movie/'; 
 const TV_EMBED_URL = 'https://vidsrc.me/embed/tv/';       
 
@@ -18,14 +18,6 @@ const fetchOptions = {
     }
 };
 
-// Menyimpan keadaan siri TV semasa
-let currentShowState = {
-    id: null,
-    currentEpisode: 1,
-    totalEpisodes: 0,
-    season: 1
-};
-
 // Elemen-Elemen DOM
 const movieGrid = document.getElementById('movie-grid');
 const movieModal = document.getElementById('movie-modal');
@@ -36,9 +28,6 @@ const modalYear = document.getElementById('modal-year');
 const modalRating = document.getElementById('modal-rating');
 const modalOverview = document.getElementById('modal-overview');
 const searchInput = document.getElementById('search');
-
-const episodesContainer = document.getElementById('episodes-container');
-const episodesList = document.getElementById('episodes-list');
 
 // Tab-tab Navigasi
 const tabMovies = document.getElementById('tab-movies');
@@ -135,10 +124,9 @@ function renderGrid(items, type) {
 }
 
 /* ==========================================
-   LOGIK MODAL PLAYER & SENARAI EPISOD SEBENAR
+   LOGIK MODAL PLAYER ASAL (TANPA LOGIK EPISOD)
    ========================================== */
-
-async function openModal(item, type) {
+function openModal(item, type) {
     movieModal.style.display = 'flex';
     modalTitle.textContent = item.title || item.name;
     const releaseDate = item.release_date || item.first_air_date || '';
@@ -146,88 +134,11 @@ async function openModal(item, type) {
     modalRating.textContent = `★ ${item.vote_average ? item.vote_average.toFixed(1) : '0.0'}`;
     modalOverview.textContent = item.overview || 'Tiada sinopsis disediakan.';
 
+    // Berdasarkan jenis kandungan, terus muatkan video ke dalam iframe secara ringkas
     if (type === 'tv') {
-        let totalEpisodes = 0;
-        try {
-            // Tarik data daripada Season 1
-            const response = await fetch(`${BASE_URL}/tv/${item.id}/season/1?language=ms-MY`, fetchOptions);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.episodes && data.episodes.length > 0) {
-                    totalEpisodes = data.episodes.length;
-                }
-            }
-        } catch (err) {
-            console.error("Gagal mendapatkan senarai episod siri TV dari TMDB:", err);
-        }
-
-        if (totalEpisodes === 0) {
-            totalEpisodes = 8; // Menggunakan backup dinamik berdasarkan gambar anda
-        }
-
-        // Simpan kedudukan siri TV dalam state global
-        currentShowState.id = item.id;
-        currentShowState.currentEpisode = 1;
-        currentShowState.totalEpisodes = totalEpisodes;
-        currentShowState.season = 1;
-
-        // Cetak butang senarai episod ke dalam modal
-        renderEpisodes(totalEpisodes);
-        episodesContainer.style.display = 'block';
-        
-        // Mainkan episod 1 secara automatik
-        playEpisode(1);
+        videoPlayer.src = `${TV_EMBED_URL}${item.id}`;
     } else {
-        episodesContainer.style.display = 'none';
         videoPlayer.src = `${MOVIE_EMBED_URL}${item.id}`;
-        currentShowState.id = null; 
-    }
-}
-
-// Bina butang nombor episod
-function renderEpisodes(total) {
-    episodesList.innerHTML = '';
-    for (let i = 1; i <= total; i++) {
-        const btn = document.createElement('button');
-        btn.classList.add('episode-btn');
-        btn.id = `ep-${i}`;
-        btn.innerText = `Ep ${i}`;
-        btn.addEventListener('click', () => {
-            playEpisode(i);
-        });
-        episodesList.appendChild(btn);
-    }
-}
-
-// Tukar sumber link player siri TV mengikut episod yang dipilih
-function playEpisode(episodeNum) {
-    currentShowState.currentEpisode = episodeNum;
-    
-    const allBtns = document.querySelectorAll('.episode-btn');
-    allBtns.forEach(btn => btn.classList.remove('active'));
-    
-    const activeBtn = document.getElementById(`ep-${episodeNum}`);
-    if (activeBtn) activeBtn.classList.add('active');
-
-    // Menghubungkan terus ke domain vidsrc.me yang aktif
-    videoPlayer.src = `${TV_EMBED_URL}${currentShowState.id}/${currentShowState.season}-${episodeNum}`;
-}
-
-/* ==========================================
-   LOGIK AUTOPLAY NEXT EPISODE
-   ========================================== */
-window.addEventListener('message', function(event) {
-    if (event.data === 'ended' || event.data?.event === 'ended' || event.data?.event === 'finish') {
-        handleVideoEnded();
-    }
-});
-
-function handleVideoEnded() {
-    if (currentShowState.id) {
-        const nextEpisode = currentShowState.currentEpisode + 1;
-        if (nextEpisode <= currentShowState.totalEpisodes) {
-            playEpisode(nextEpisode);
-        }
     }
 }
 

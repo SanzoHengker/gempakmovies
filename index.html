@@ -48,7 +48,7 @@
         </div>
     </main>
 
-    <!-- HTML POP-UP MODAL (VERSI ASAL TANPA GRID EPISOD) -->
+    <!-- HTML POP-UP MODAL DENGAN SERVER PLAYER -->
     <div id="movie-modal" class="modal">
         <div class="modal-content">
             <span id="close-modal" class="close-btn">&times;</span>
@@ -72,12 +72,20 @@
                     <span id="modal-rating" style="color: #f5c518;">★ 0.0</span>
                 </div>
                 <p id="modal-overview" class="modal-overview">Sinopsis...</p>
+                
+                <!-- Pemilihan Episod (Hanya untuk Siri TV) -->
+                <div id="episodes-container" class="episodes-container" style="display: none;">
+                    <h3 class="episodes-title">Senarai Episod</h3>
+                    <div id="episodes-list" class="episodes-list">
+                        <!-- Butang episod akan dimasukkan secara dinamik oleh JS -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2026 GempakMovies. Dikuasakan oleh MSZ Studios</p>
+        <p>&copy; 2026 GempakMovies. Dikuasakan oleh TMDB & Embed Pihak Ketiga.</p>
     </footer>
 
     <!-- Dipanggil menggunakan type="module" untuk sokongan Firebase SDK modular -->

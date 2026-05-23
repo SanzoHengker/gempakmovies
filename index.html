@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GempakMovies | Database Filem Terkini</title>
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #111;
+            color: #fff;
+        }
+
+        /* Navigation Bar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 6%;
+            background-color: rgba(0, 0, 0, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e50914;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Search Bar di Nav */
+        .search-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-bar {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #444;
+            background-color: #222;
+            color: white;
+            outline: none;
+            width: 250px;
+        }
+
+        /* Movie Section */
+        .main-content {
+            padding: 40px 6%;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 25px;
+            border-left: 4px solid #e50914;
+            padding-left: 10px;
+        }
+
+        /* Movie Grid Layout */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px;
+        }
+
+        .movie-card {
+            background-color: #1c1c1c;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.2);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+            background-color: #333;
+        }
+
+        .movie-info {
+            padding: 12px;
+        }
+
+        .movie-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .movie-rating {
+            color: #f5c518;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #000;
+            color: #666;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">GempakMovies</div>
+        <div class="search-container">
+            <input type="text" id="search" class="search-bar" placeholder="Cari filem di sini...">
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h2 id="title-display" class="section-title">Filem Popular Hari Ini</h2>
+        <div id="movie-grid" class="movie-grid">
+            <!-- JavaScript akan masukkan kad filem di sini secara automatik -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 GempakMovies. Dikuasakan oleh TMDB API.</p>
+    </footer>
+
+    <!-- JavaScript untuk Ambil Data Filem -->
+    <script>
+        // API Key demo (Guna public key TMDB untuk tujuan pembelajaran)
+        const API_KEY = '3fd2be6f0c70a2a598f084ddfb2154c8'; 
+        const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+        const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+
+        const movieGrid = document.getElementById('movie-grid');
+        const searchInput = document.getElementById('search');
+        const titleDisplay = document.getElementById('title-display');
+
+        // 1. Fungsi untuk ambil data filem popular semasa halaman dibuka
+        async function dapatkanFilemPopular() {
+            const url = `${TMDB_BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
+            try {
+                const respon = await fetch(url);
+                const data = await respon.json();
+                paparkanFilem(data.results);
+            } catch (ralat) {
+                console.error("Gagal memuatkan data filem:", ralat);
+            }
+        }
+
+        // 2. Fungsi untuk papar filem ke dalam HTML grid
+        function paparkanFilem(filemList) {
+            movieGrid.innerHTML = ''; // Kosongkan grid asal
+
+            if(filemList.length === 0) {
+                movieGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666;">Filem tidak ditemui.</p>`;
+                return;
+            }
+
+            filemList.forEach(filem => {
+                const { title, poster_path, vote_average, release_date } = filem;
+                
+                // Ganti gambar kosong jika tiada poster
+                const gambarPoster = poster_path ? IMG_URL + poster_path : 'https://via.placeholder.com/500x750?text=No+Poster';
+                const tahunLancar = release_date ? release_date.split('-')[0] : 'N/A';
+
+                const kadFilem = document.createElement('div');
+                kadFilem.classList.add('movie-card');
+                
+                kadFilem.innerHTML = `
+                    <img class="movie-poster" src="${gambarPoster}" alt="${title}">
+                    <div class="movie-info">
+                        <div class="movie-name" title="${title}">${title}</div>
+                        <div class="movie-meta">
+                            <span>${tahunLancar}</span>
+                            <span class="movie-rating">★ ${vote_average.toFixed(1)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                movieGrid.appendChild(kadFilem);
+            });
+        }
+
+        // 3. Fungsi Carian Filem (Bila user taip di search bar)
+        searchInput.addEventListener('keyup', async (e) => {
+            const kataKunci = e.target.value.trim();
+
+            if (kataKunci && kataKunci !== '') {
+                titleDisplay.innerText = `Hasil Carian untuk: "${kataKunci}"`;
+                const urlCarian = `${TMDB_BASE_URL}/search/movie?api_key=${API_KEY}&query=${kataKunci}&language=en-US&page=1`;
+                
+                try {
+                    const respon = await fetch(urlCarian);
+                    const data = await respon.json();
+                    paparkanFilem(data.results);
+                } catch (ralat) {
+                    console.error("Gagal mencari filem:", ralat);
+                }
+            } else {
+                titleDisplay.innerText = "Filem Popular Hari Ini";
+                dapatkanFilemPopular();
+            }
+        });
+
+        // Jalankan fungsi utama semasa mula-mula buka website
+        dapatkanFilemPopular();
+    </script>
+</body>
+</html>

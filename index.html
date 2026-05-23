@@ -5,15 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GempakMovies | Portal Filem & Streaming</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Tambah font ikon untuk butang bookmark kegemaran -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <!-- Navigation -->
     <nav>
         <div class="logo">GempakMovies</div>
+        
+        <!-- Tab Penukaran Kandungan -->
+        <div class="nav-tabs">
+            <span id="tab-movies" class="nav-tab active">Filem</span>
+            <span id="tab-tv" class="nav-tab">Siri TV</span>
+            <span id="tab-watchlist" class="nav-tab">Watchlist Saya</span>
+        </div>
+
         <div class="search-container">
-            <input type="text" id="search" class="search-bar" placeholder="Cari filem di sini...">
-            <button id="logout-btn" class="logout-btn">Keluar</button>
+            <input type="text" id="search" class="search-bar" placeholder="Cari di sini...">
+            
+            <!-- Menu Profil Pengguna -->
+            <div class="profile-dropdown">
+                <button id="profile-btn" class="profile-btn"><i class="fa-solid fa-user"></i> Profil</button>
+                <div id="profile-menu" class="dropdown-content">
+                    <p id="user-email-display">Memuatkan emel...</p>
+                    <p id="user-joined-display" class="user-meta-text">Daftar: -</p>
+                    <hr style="border-color: #333; margin: 8px 0;">
+                    <button id="logout-btn" class="logout-btn-link">Keluar Akaun</button>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -35,9 +55,15 @@
                 <iframe id="video-player" src="" allowfullscreen scrolling="no"></iframe>
             </div>
 
-            <!-- Ruang Informasi Filem -->
+            <!-- Ruang Informasi Filem / Siri TV -->
             <div class="modal-details">
-                <h2 id="modal-title" class="modal-title">Tajuk Filem</h2>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h2 id="modal-title" class="modal-title">Tajuk Kandungan</h2>
+                    <!-- Butang Watchlist -->
+                    <button id="modal-watchlist-btn" class="watchlist-toggle-btn">
+                        <i class="fa-regular fa-bookmark"></i> Tambah Watchlist
+                    </button>
+                </div>
                 <div class="modal-meta">
                     <span id="modal-year">Tahun</span>
                     <span id="modal-rating" style="color: #f5c518;">★ 0.0</span>
@@ -48,10 +74,17 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 GempakMovies. Dikuasakan oleh TMDB & Embed Pihak Ketiga.</p>
+        <p>&copy; 2026 GempakMovies. Dikuasakan oleh MSZ Studios</p>
     </footer>
 
-    <!-- Dipanggil menggunakan type="module" untuk sokongan Firebase SDK modular -->
+    <!-- Firebase SDK (Guna App, Auth, dan Firestore) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    </script>
+
+    <!-- JavaScript Portal Utama -->
     <script type="module" src="script.js"></script>
 </body>
 </html>

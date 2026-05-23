@@ -4,8 +4,10 @@ const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzYjZjZjg4YzIxMjBiNTk5ODdiYjI5
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
-const MOVIE_EMBED_URL = 'https://vidsrc.xyz/embed/movie/'; 
-const TV_EMBED_URL = 'https://vidsrc.xyz/embed/tv/';       
+
+// TUKAR DOMAIN KE vidsrc.me (LEBIH STABIL & AKTIF)
+const MOVIE_EMBED_URL = 'https://vidsrc.me/embed/movie/'; 
+const TV_EMBED_URL = 'https://vidsrc.me/embed/tv/';       
 
 // Tetapan Headers Token API Read Access
 const fetchOptions = {
@@ -64,7 +66,7 @@ if (profileBtn && profileMenu) {
 }
 
 /* ==========================================
-   MENDAPATKAN DATA LIVE DARI TMDB (TIADA MOCK DATA LAGI)
+   MENDAPATKAN DATA LIVE DARI TMDB
    ========================================== */
 
 // Ambil data senarai popular dari TMDB (LIVE)
@@ -95,7 +97,7 @@ async function searchContent(query) {
     }
 }
 
-// Bina senarai kad dalam grid halaman utama secara dinamik dengan poster betul
+// Bina senarai kad dalam grid halaman utama
 function renderGrid(items, type) {
     movieGrid.innerHTML = '';
     if (!items || items.length === 0) {
@@ -107,7 +109,6 @@ function renderGrid(items, type) {
         const card = document.createElement('div');
         card.classList.add('movie-card');
         
-        // Ambil poster sebenar dari TMDB
         const posterSrc = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : 'https://via.placeholder.com/500x750?text=No+Poster';
         const titleText = item.title || item.name;
         const releaseDate = item.release_date || item.first_air_date || '';
@@ -148,7 +149,7 @@ async function openModal(item, type) {
     if (type === 'tv') {
         let totalEpisodes = 0;
         try {
-            // Tarik data rincian siri TV untuk dapatkan jumlah episod dalam Season 1
+            // Tarik data daripada Season 1
             const response = await fetch(`${BASE_URL}/tv/${item.id}/season/1?language=ms-MY`, fetchOptions);
             if (response.ok) {
                 const data = await response.json();
@@ -160,9 +161,8 @@ async function openModal(item, type) {
             console.error("Gagal mendapatkan senarai episod siri TV dari TMDB:", err);
         }
 
-        // Jika API gagal pulangkan episod, kita bagi backup standard 10 episod supaya tak kosong
         if (totalEpisodes === 0) {
-            totalEpisodes = 10;
+            totalEpisodes = 8; // Menggunakan backup dinamik berdasarkan gambar anda
         }
 
         // Simpan kedudukan siri TV dalam state global
@@ -178,7 +178,6 @@ async function openModal(item, type) {
         // Mainkan episod 1 secara automatik
         playEpisode(1);
     } else {
-        // Jika filem biasa, sembunyikan bahagian episod
         episodesContainer.style.display = 'none';
         videoPlayer.src = `${MOVIE_EMBED_URL}${item.id}`;
         currentShowState.id = null; 
@@ -192,7 +191,6 @@ function renderEpisodes(total) {
         const btn = document.createElement('button');
         btn.classList.add('episode-btn');
         btn.id = `ep-${i}`;
-        btn.textContent = `Ep i`; // Ini akan memaparkan nombor episod
         btn.innerText = `Ep ${i}`;
         btn.addEventListener('click', () => {
             playEpisode(i);
@@ -211,14 +209,13 @@ function playEpisode(episodeNum) {
     const activeBtn = document.getElementById(`ep-${episodeNum}`);
     if (activeBtn) activeBtn.classList.add('active');
 
-    // Load episod dalam player dengan parameter autoplay
-    videoPlayer.src = `${TV_EMBED_URL}${currentShowState.id}&s=${currentShowState.season}&e=${episodeNum}&autoplay=1`;
+    // Menghubungkan terus ke domain vidsrc.me yang aktif
+    videoPlayer.src = `${TV_EMBED_URL}${currentShowState.id}/${currentShowState.season}-${episodeNum}`;
 }
 
 /* ==========================================
    LOGIK AUTOPLAY NEXT EPISODE
    ========================================== */
-// Mendengarkan isyarat tamat tayangan daripada iframe player
 window.addEventListener('message', function(event) {
     if (event.data === 'ended' || event.data?.event === 'ended' || event.data?.event === 'finish') {
         handleVideoEnded();
@@ -229,10 +226,7 @@ function handleVideoEnded() {
     if (currentShowState.id) {
         const nextEpisode = currentShowState.currentEpisode + 1;
         if (nextEpisode <= currentShowState.totalEpisodes) {
-            console.log(`Episod ${currentShowState.currentEpisode} selesai. Memulakan Episod ${nextEpisode} secara automatik.`);
             playEpisode(nextEpisode);
-        } else {
-            console.log("Musim ini telah tamat.");
         }
     }
 }
@@ -241,7 +235,6 @@ function handleVideoEnded() {
    EVENT LISTENERS KAWALAN MODAL & NAV
    ========================================== */
 
-// Kawalan Tutup Modal
 if (closeModal) {
     closeModal.addEventListener('click', () => {
         movieModal.style.display = 'none';
@@ -292,5 +285,5 @@ function setActiveTab(tabElement, titleText) {
     if (searchInput) searchInput.value = ''; 
 }
 
-// Panggilan pertama semasa web dibuka (Muat turun filem popular live dari TMDB)
+// Panggilan pertama semasa web dibuka
 fetchContent('movie');
